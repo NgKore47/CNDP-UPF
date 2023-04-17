@@ -1,0 +1,136 @@
+diff --git a/conf/cndp_upf_1worker.jsonc b/conf/cndp_upf_1worker.jsonc
+index da60d51..83ee3d9 100644
+--- a/conf/cndp_upf_1worker.jsonc
++++ b/conf/cndp_upf_1worker.jsonc
+@@ -84,9 +84,9 @@
+     //    description   - (O) The description, 'desc' can be used as well
+     // CNDP lports for Access network followed by lports for Core network.
+     "lports": {
+-        "enp134s0:0": {
++        "ens4f0:0": {
+             "pmd": "net_af_xdp",
+-            "qid": 22,
++            "qid": 6,
+             "umem": "umem0",
+             "region": 0,
+             "busy_poll": true,
+@@ -94,9 +94,9 @@
+             "busy_timeout": 20,
+             "description": "Access LAN 0 port"
+         },
+-        "enp136s0:0": {
++        "ens4f1:0": {
+             "pmd": "net_af_xdp",
+-            "qid": 22,
++            "qid": 6,
+             "umem": "umem0",
+             "region": 1,
+             "busy_poll": true,
+diff --git a/conf/upf.json b/conf/upf.json
+index 62fa435..6687ced 100644
+--- a/conf/upf.json
++++ b/conf/upf.json
+@@ -3,8 +3,8 @@
+     "": "mode: af_xdp",
+     "": "mode: af_packet",
+     "": "mode: sim",
+-    "": "mode: cndp",
+-    "mode": "dpdk",
++    "": "mode: dpdk",
++    "mode": "cndp",
+ 
+     "table_sizes": {
+         "": "Example sizes based on sim mode and 50K sessions. Customize as per your control plane",
+@@ -62,14 +62,14 @@
+ 
+     "": "Gateway interfaces",
+     "access": {
+-        "ifname": "ens803f2",
+-        "": "cndp_jsonc_file: /opt/bess/bessctl/conf/cndp_upf_1worker.jsonc"
++        "ifname": "ens4f0",
++        "cndp_jsonc_file": "/opt/bess/bessctl/conf/cndp_upf_1worker.jsonc"
+     },
+ 
+     "": "UE IP Natting. Update the line below to `\"ip_masquerade\": \"<ip> [or <ip>]\"` to enable",
+     "core": {
+-        "ifname": "ens803f3",
+-        "": "cndp_jsonc_file: /opt/bess/bessctl/conf/cndp_upf_1worker.jsonc",
++        "ifname": "ens4f1",
++        "cndp_jsonc_file": "/opt/bess/bessctl/conf/cndp_upf_1worker.jsonc",
+         "": "ip_masquerade: 18.0.0.1 or 18.0.0.2 or 18.0.0.3"
+     },
+ 
+diff --git a/scripts/cndp_reset_upf.sh b/scripts/cndp_reset_upf.sh
+index ca90130..e903549 100755
+--- a/scripts/cndp_reset_upf.sh
++++ b/scripts/cndp_reset_upf.sh
+@@ -8,13 +8,13 @@ MODE=${1:-cndp}
+ 
+ BUSY_POLL=${2:-true}
+ 
+-ACCESS_PCIE=0000:86:00.0
+-CORE_PCIE=0000:88:00.0
++ACCESS_PCIE=0000:d8:00.0
++CORE_PCIE=0000:d8:00.1
+ 
+-ACCESS_IFACE=enp134s0
+-CORE_IFACE=enp136s0
++ACCESS_IFACE=ens4f0
++CORE_IFACE=ens4f1
+ 
+-SET_IRQ_AFFINITY=~/nic/driver/ice-1.9.7/scripts/set_irq_affinity
++SET_IRQ_AFFINITY=/home/worker/driver/ice-1.9.7/scripts/set_irq_affinity
+ 
+ sudo dpdk-devbind.py -u $ACCESS_PCIE --force
+ sudo dpdk-devbind.py -u $CORE_PCIE --force
+diff --git a/scripts/docker_setup.sh b/scripts/docker_setup.sh
+index 9058839..2e86d9b 100755
+--- a/scripts/docker_setup.sh
++++ b/scripts/docker_setup.sh
+@@ -15,8 +15,8 @@ metrics_port=8080
+ # "af_packet" uses AF_PACKET sockets via DPDK's vdev for pkt I/O.
+ # "sim" uses Source() modules to simulate traffic generation
+ # "cndp" use kernel AF-XDP. It supports ZC and XDP offload if driver and NIC supports it. It's tested on Intel 800 series n/w adapter.
+-mode="dpdk"
+-#mode="cndp"
++#mode="dpdk"
++mode="cndp"
+ #mode="af_xdp"
+ #mode="af_packet"
+ #mode="sim"
+@@ -24,7 +24,7 @@ mode="dpdk"
+ # Gateway interface(s)
+ #
+ # In the order of ("s1u" "sgi")
+-ifaces=("ens803f2" "ens803f3")
++ifaces=("ens4f0" "ens4f1")
+ 
+ # Static IP addresses of gateway interface(s) in cidr format
+ #
+@@ -34,7 +34,7 @@ ipaddrs=(198.18.0.1/30 198.19.0.1/30)
+ # MAC addresses of gateway interface(s)
+ #
+ # In the order of (s1u sgi)
+-macaddrs=(9e:b2:d3:34:ab:27 c2:9c:55:d4:8a:f6)
++macaddrs=(3c:ec:ef:d9:62:f2 3c:ec:ef:d9:62:f3)
+ 
+ # Static IP addresses of the neighbors of gateway interface(s)
+ #
+@@ -44,7 +44,7 @@ nhipaddrs=(198.18.0.2 198.19.0.2)
+ # Static MAC addresses of the neighbors of gateway interface(s)
+ #
+ # In the order of (n-s1u n-sgi)
+-nhmacaddrs=(22:53:7a:15:58:50 22:53:7a:15:58:50)
++nhmacaddrs=(3c:ec:ef:d9:63:50 3c:ec:ef:d9:63:51)
+ 
+ # IPv4 route table entries in cidr format per port
+ #
+@@ -104,7 +104,7 @@ function move_ifaces() {
+ 			# num queues
+ 			num_q=1
+ 			# start queue index
+-			start_q_idx=22
++			start_q_idx=6
+ 			# RSS using TC filter
+ 			setup_tc "${ifaces[$i]}" $num_q $start_q_idx
+ 		fi
