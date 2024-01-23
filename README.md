@@ -430,7 +430,7 @@ Follow these links for this:
 
 **For DDP installation**
 
-Follow this [guide](https://builders.intel.com/docs/networkbuilders/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) for this.
+Follow this [guide](./docs/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) for this.
 
 **Solving the DDP issue:**
 
