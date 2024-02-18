@@ -48,7 +48,7 @@ sudo modprobe ice
 
 The setup uses Physical Function (PF) of PCIe network adaptor (where the driver supports AF-XDP zero copy ) for improved network I/O performance. AF-XDP zero copy support for SR-IOV driver and sub function support using devlink will be supported in future releases.
 
-System 1 and System 2 are connected using  physical links. Setup uses two network ports which represents access and core interface. This test setup uses Intel Ethernet 800 series network adapter (hereafter referred to as NIC).  NIC in System 1 has Intel Dynamics Device Personalization (DDP) for telecommunications workload enabled. DDP profile can help in GTPU packet traffic steering to required NIC hardware queues using RSS (Receive Side Scaling). DDP feature works along with XDP offload feature in NIC hardware to redirect GTPU packets directly to user space via AF-XDP sockets. Refer the Deployment section in this [document](https://builders.intel.com/docs/networkbuilders/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) to enable DDP. Please follow Intel ethernet controller E810 DDP for telecommunications technology guide.
+System 1 and System 2 are connected using  physical links. Setup uses two network ports which represents access and core interface. This test setup uses Intel Ethernet 800 series network adapter (hereafter referred to as NIC).  NIC in System 1 has Intel Dynamics Device Personalization (DDP) for telecommunications workload enabled. DDP profile can help in GTPU packet traffic steering to required NIC hardware queues using RSS (Receive Side Scaling). DDP feature works along with XDP offload feature in NIC hardware to redirect GTPU packets directly to user space via AF-XDP sockets. Refer the Deployment section in this [document](./docs/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) to enable DDP. Please follow Intel ethernet controller E810 DDP for telecommunications technology guide.
 
 ## Step 3: Run UPF in System 1
 
@@ -430,7 +430,7 @@ Follow these links for this:
 
 **For DDP installation**
 
-Follow this [guide](https://builders.intel.com/docs/networkbuilders/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) for this.
+Follow this [guide](./docs/intel-ethernet-controller-800-series-device-personalization-ddp-for-telecommunications-workloads-technology-guide.pdf) for this.
 
 **Solving the DDP issue:**
 
